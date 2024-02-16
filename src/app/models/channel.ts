@@ -5,8 +5,7 @@ import Video from './video';
 export default class Channel extends Model {
   @Column({
     type: DataType.STRING,
-    allowNull: false,
-    unique: true,
+    allowNull: false
   })
   youtubeId!: string;
 
