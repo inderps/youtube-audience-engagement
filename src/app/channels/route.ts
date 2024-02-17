@@ -10,9 +10,9 @@ export async function POST(request: Request) {
     const videos = await youtubeService.fetchAndSaveVideos(channel);
     await youtubeService.fetchAndSaveComments(videos);
 
-    Response.json({ channelId: channel.id, message: 'Channel processed successfully'});
+    return Response.json({ channelId: channel.id, message: 'Channel processed successfully'});
   } catch (error: any) {
     console.error('Failed to process channel:', error.message);
-    Response.json({ message: 'Failed to process channel', error: error.message });
+    return Response.json({ message: 'Failed to process channel', error: error.message });
   }
 }
