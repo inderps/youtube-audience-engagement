@@ -21,5 +21,10 @@ describe('YouTubeService', () => {
     const videos = await youtubeService.fetchAndSaveVideos(channel);
 
     expect(videos.length).toBeGreaterThan(0);
+
+    const comments = await youtubeService.fetchAndSaveComments(videos);
+
+    console.log(comments);
+    expect(comments.length).toBeGreaterThan(0);
   });
 });

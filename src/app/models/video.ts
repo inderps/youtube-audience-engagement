@@ -1,6 +1,6 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, HasMany, DataType } from 'sequelize-typescript';
 import Channel from './channel';
-// import Comment from './comment';
+import Comment from './comment';
 
 @Table
 export default class Video extends Model {
@@ -26,6 +26,6 @@ export default class Video extends Model {
   @BelongsTo(() => Channel)
   channel!: Channel;
 
-  // @HasMany(() => Comment)
-  // comments!: Comment[];
+  @HasMany(() => Comment)
+  comments!: Comment[];
 }

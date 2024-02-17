@@ -1,11 +1,9 @@
 import { google, youtube_v3 } from 'googleapis';
 import Channel from '../models/channel';
 import Video from '../models/video';
+import Comment from '../models/comment';
 import { Sequelize } from 'sequelize-typescript';
 import { channelId as getYoutubeId } from '@gonetone/get-youtube-id-by-url';
-// import Video from '../models/video';
-// import Comment from '../models/comment';
-// import sequelize from '@/app/models/sequelize';
 
 export default class YouTubeService {
   private sequelize: Sequelize;
@@ -30,7 +28,8 @@ export default class YouTubeService {
     const response = await this.youtube.search.list({
       part: ['snippet'],
       channelId: channel.youtubeId,
-      maxResults: 10,
+      maxResults: 2,
+      // maxResults: 10,
       order: 'date',
     });
 
@@ -53,56 +52,36 @@ export default class YouTubeService {
 
     return videos;
   }
+
+  async fetchAndSaveComments(videos: Video[]): Promise<Comment[]> {
+    let createCommentPromises: Promise<Comment>[] = [];
+
+    const fetchCommentsPromises = videos.map(async (video) => {
+      const response = await this.youtube.commentThreads.list({
+        part: ['snippet'],
+        videoId: video.youtubeId,
+        maxResults: 100,
+      });
+
+      const items = response.data.items;
+
+      if (items) {
+        items.forEach((item) => {
+          if (item.snippet?.topLevelComment?.snippet?.textDisplay) {
+            createCommentPromises.push(Comment.create({
+              text: item.snippet.topLevelComment.snippet.textDisplay,
+              videoId: video.id,
+              channelId: video.channelId,
+            }));
+          }
+        });
+      }
+    });
+
+    await Promise.all(fetchCommentsPromises);
+
+    const comments = await Promise.all(createCommentPromises);
+
+    return comments;
+  }
 }
-
-// export class YouTubeService {
-//   static async createChannel(youtubeId: string): Promise<Channel> {
-//     const channel = await Channel.create({ youtubeId });
-//     return channel;
-//   }
-
-//   static async fetchAndSaveVideos(channelId: string): Promise<void> {
-//     const response = await youtube.search.list({
-//       // part: 'snippet',
-//       channelId,
-//       maxResults: 10,
-//       order: 'date',
-//     });
-
-//     console.log(response.data.items);
-
-//     // const channel = await Channel.findOne({ where: { youtubeId: channelId } });
-//     // if (!channel) throw new Error('Channel not found');
-
-//     // if (!response.data?.items) return;
-
-//     // response.data.items.forEach(async (item) => {
-//     //   if (!item.id || !item.snippet) return;
-
-//     //   await Video.create({
-//     //     youtubeId: item.id.videoId,
-//     //     name: item.snippet.title,
-//     //     channelId: channel.id,
-//     //   });
-//     // });
-//   }
-
-//   static async fetchAndSaveComments(videoId: string): Promise<void> {
-//     // const response = await youtube.commentThreads.list({
-//     //   part: 'snippet',
-//     //   videoId,
-//     //   maxResults: 100,
-//     // });
-
-//     // const video = await Video.findOne({ where: { youtubeId: videoId } });
-//     // if (!video) throw new Error('Video not found');
-
-//     // response.data.items.forEach(async (item) => {
-//     //   await Comment.create({
-//     //     text: item.snippet.topLevelComment.snippet.textDisplay,
-//     //     videoId: video.id,
-//     //     channelId: video.channelId,
-//     //   });
-//     // });
-//   }
-// }

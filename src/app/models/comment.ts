@@ -1,32 +1,32 @@
-import { Table, Column, Model, ForeignKey, BelongsTo, DataType } from 'sequelize-typescript';
-import Video from './video';
+import { Table, Column, Model, ForeignKey, BelongsTo, HasMany, DataType } from 'sequelize-typescript';
 import Channel from './channel';
+import Video from './video';
 
 @Table
 export default class Comment extends Model {
   @Column({
     type: DataType.TEXT,
-    allowNull: false,
+    allowNull: false
   })
-  text!: string;
+  text!: Text;
 
   @ForeignKey(() => Video)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   videoId!: number;
-
-  @BelongsTo(() => Video)
-  video!: Video;
 
   @ForeignKey(() => Channel)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   channelId!: number;
 
   @BelongsTo(() => Channel)
   channel!: Channel;
+
+  @BelongsTo(() => Video)
+  video!: Video;
 }
