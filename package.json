@@ -12,13 +12,16 @@
   },
   "dependencies": {
     "@gonetone/get-youtube-id-by-url": "^1.0.1",
+    "@nivo/pie": "^0.84.0",
     "dotenv": "^16.4.4",
     "googleapis": "^133.0.0",
     "next": "14.1.0",
+    "openai": "^4.28.0",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "react": "^18",
     "react-dom": "^18",
+    "recharts": "^2.12.0",
     "sequelize": "^6.37.0",
     "sequelize-typescript": "^2.1.6"
   },
