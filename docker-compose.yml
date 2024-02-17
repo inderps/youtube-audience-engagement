@@ -6,7 +6,7 @@ services:
       - .:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - '3000:3000'
     command: npm run dev
     environment:
       - DATABASE_URL=postgres://user:password@db:5432/dbname
@@ -15,7 +15,7 @@ services:
   db:
     image: postgres:13
     ports:
-      - "5432:5432" 
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:

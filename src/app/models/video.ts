@@ -1,4 +1,12 @@
-import { Table, Column, Model, ForeignKey, BelongsTo, HasMany, DataType } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  ForeignKey,
+  BelongsTo,
+  HasMany,
+  DataType,
+} from 'sequelize-typescript';
 import Channel from './channel';
 import Comment from './comment';
 
@@ -6,20 +14,20 @@ import Comment from './comment';
 export default class Video extends Model {
   @Column({
     type: DataType.STRING,
-    allowNull: false
+    allowNull: false,
   })
   youtubeId!: string;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false
+    allowNull: false,
   })
   name!: string;
 
   @ForeignKey(() => Channel)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false
+    allowNull: false,
   })
   channelId!: number;
 

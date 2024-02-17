@@ -14,7 +14,9 @@ describe('YouTubeService', () => {
   });
 
   test('tests the whole flow', async () => {
-    const channel = await youtubeService.createChannel('https://www.youtube.com/@beinghonest');
+    const channel = await youtubeService.createChannel(
+      'https://www.youtube.com/@beinghonest',
+    );
 
     expect(channel.youtubeId).toEqual('UCbrgKz68f3NvLr7p3Oiw9nA');
 
@@ -26,7 +28,9 @@ describe('YouTubeService', () => {
 
     expect(comments.length).toBeGreaterThan(0);
 
-    const commentsInDb = await youtubeService.fetchCommentsByChannelId(channel.id);
+    const commentsInDb = await youtubeService.fetchCommentsByChannelId(
+      channel.id,
+    );
 
     expect(commentsInDb.length).toEqual(comments.length);
   });

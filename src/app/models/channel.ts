@@ -6,7 +6,7 @@ import Comment from './comment';
 export default class Channel extends Model {
   @Column({
     type: DataType.STRING,
-    allowNull: false
+    allowNull: false,
   })
   youtubeId!: string;
 

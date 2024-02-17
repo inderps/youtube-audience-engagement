@@ -19,7 +19,9 @@ export default class YouTubeService {
 
   async createChannel(url: string): Promise<Channel> {
     const youtubeId = await getYoutubeId(url);
-    const channel = await this.sequelize.getRepository(Channel).create({ youtubeId });
+    const channel = await this.sequelize
+      .getRepository(Channel)
+      .create({ youtubeId });
     return channel;
   }
 
@@ -36,16 +38,17 @@ export default class YouTubeService {
     const items = response.data.items;
 
     if (items) {
+      const createVideoPromises = items.map(
+        async (item: youtube_v3.Schema$SearchResult) => {
+          const video = await Video.create({
+            youtubeId: item.id?.videoId || '',
+            name: item.snippet?.title || '',
+            channelId: channel.id,
+          });
 
-      const createVideoPromises = items.map(async (item: youtube_v3.Schema$SearchResult) => {
-        const video = await Video.create({
-          youtubeId: item.id?.videoId || '',
-          name: item.snippet?.title || '',
-          channelId: channel.id,
-        });
-
-        return video;
-      });
+          return video;
+        },
+      );
 
       videos = await Promise.all(createVideoPromises);
     }
@@ -54,7 +57,7 @@ export default class YouTubeService {
   }
 
   async fetchAndSaveComments(videos: Video[]): Promise<Comment[]> {
-    let createCommentPromises: Promise<Comment>[] = [];
+    const createCommentPromises: Promise<Comment>[] = [];
 
     const fetchCommentsPromises = videos.map(async (video) => {
       const response = await this.youtube.commentThreads.list({
@@ -68,11 +71,13 @@ export default class YouTubeService {
       if (items) {
         items.forEach((item) => {
           if (item.snippet?.topLevelComment?.snippet?.textDisplay) {
-            createCommentPromises.push(Comment.create({
-              text: item.snippet.topLevelComment.snippet.textDisplay,
-              videoId: video.id,
-              channelId: video.channelId,
-            }));
+            createCommentPromises.push(
+              Comment.create({
+                text: item.snippet.topLevelComment.snippet.textDisplay,
+                videoId: video.id,
+                channelId: video.channelId,
+              }),
+            );
           }
         });
       }
@@ -87,11 +92,13 @@ export default class YouTubeService {
 
   async fetchCommentsByChannelId(channelId: number): Promise<Comment[]> {
     const comments = await Comment.findAll({
-      include: [{
-        model: Video,
-        where: { channelId },
-        required: true // Only include comments from videos that match the filter
-      }]
+      include: [
+        {
+          model: Video,
+          where: { channelId },
+          required: true, // Only include comments from videos that match the filter
+        },
+      ],
     });
 
     return comments;
