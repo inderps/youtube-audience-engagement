@@ -14,8 +14,8 @@ export async function POST(request: Request) {
       channelId: channel.id,
       message: 'Channel processed successfully',
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     console.error('Failed to process channel:', error.message);
     return Response.json({
       message: 'Failed to process channel',
