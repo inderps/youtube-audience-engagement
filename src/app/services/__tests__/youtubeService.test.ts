@@ -1,4 +1,4 @@
-import { sequelizeTest } from '../../models/sequelize';
+import { sequelizeTest } from '../../models/sequelizeTest';
 import YouTubeService from './../youtubeService';
 
 describe('YouTubeService', () => {
@@ -24,7 +24,10 @@ describe('YouTubeService', () => {
 
     const comments = await youtubeService.fetchAndSaveComments(videos);
 
-    console.log(comments);
     expect(comments.length).toBeGreaterThan(0);
+
+    const commentsInDb = await youtubeService.fetchCommentsByChannelId(channel.id);
+
+    expect(commentsInDb.length).toEqual(comments.length);
   });
 });

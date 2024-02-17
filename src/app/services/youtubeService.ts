@@ -84,4 +84,16 @@ export default class YouTubeService {
 
     return comments;
   }
+
+  async fetchCommentsByChannelId(channelId: number): Promise<Comment[]> {
+    const comments = await Comment.findAll({
+      include: [{
+        model: Video,
+        where: { channelId },
+        required: true // Only include comments from videos that match the filter
+      }]
+    });
+
+    return comments;
+  }
 }
