@@ -37,14 +37,8 @@ describe('OpenaiService', () => {
 
     const response = await openaiService.analyzeOverallSentiments(channel.id);
 
-    console.log(response);
-
-    // expect(response).toEqual({
-    //   'Video 1': {
-
-    // Assertions
-    // Here you should assert the expected behavior/output of your method.
-    // This could involve checking if the method correctly logs the output,
-    // or if it saves the analysis result somewhere, depending on your implementation.
+    expect(response).toHaveProperty('positive');
+    expect(response).toHaveProperty('negative');
+    expect(response).toHaveProperty('neutral');
   });
 });
