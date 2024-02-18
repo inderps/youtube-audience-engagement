@@ -30,7 +30,7 @@ export default class YouTubeService {
     const response = await this.youtube.search.list({
       part: ['snippet'],
       channelId: channel.youtubeId,
-      maxResults: 2,
+      maxResults: 10,
       // maxResults: 10,
       order: 'date',
     });
@@ -63,7 +63,7 @@ export default class YouTubeService {
       const response = await this.youtube.commentThreads.list({
         part: ['snippet'],
         videoId: video.youtubeId,
-        maxResults: 100,
+        maxResults: 30,
       });
 
       const items = response.data.items;

@@ -14,11 +14,9 @@ export default async function Page({ params }: PageProps) {
   );
 
   // answers = "suggestion1, suggestion 2, suggestion 3"
-  const answers = await openaiService.analyzeTopVideoRequests(
+  const suggestions = await openaiService.analyzeTopVideoRequests(
     parseInt(params.id),
   );
-
-  const suggestions = answers.split(', ').filter(Boolean);
 
   return (
     <div className="dark:bg-gray-800 dark:text-gray-200 p-4">
