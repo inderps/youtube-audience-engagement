@@ -36,4 +36,28 @@ export default class Video extends Model {
 
   @HasMany(() => Comment)
   comments!: Comment[];
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  sentimentsForVideo!: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  topVideoRequests!: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  faqInsideComments!: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  emotionalTone!: string;
 }

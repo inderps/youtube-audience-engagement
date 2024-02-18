@@ -29,6 +29,11 @@ export default class OpenaiService {
   async analyzeSentimentsForVideo(
     video: Video,
   ): Promise<SentimentAnalysisResult | undefined> {
+    if (video.sentimentsForVideo) {
+      const existingAnalysis = JSON.parse(video.sentimentsForVideo);
+      return existingAnalysis;
+    }
+
     const message =
       "You are a youtube video comments analyzer for a youtube video. Summarize the main concerns and overall feelings of the audience about the video based on the comments provided below, focusing on the content creator's value. Provide the overall feelings of the audience in percentages (positive, negative, neutral), excluding negative sentiments not related to content quality. The summary should be in JSON format, including counts of positive, negative, and neutral sentiments Eg: { positive: 100, negative: 0, neutral: 0 content_quality: 'Audience values the content for being great, loved, and very informative.' }. Do not include ``json quotes in your response. Also keys should be under quotes. I will directly do JSON.parse(answer) to your answer. Make sure that content_quality is atleast 300 words longs. Don't invenst your own content, make it totally based on comments. Exclude comments that are not related to the content creator's value. Don't count them";
 
@@ -38,20 +43,39 @@ export default class OpenaiService {
       return;
     }
 
+    video.sentimentsForVideo = responseText;
+    await video.save();
+
     const analysisResult: SentimentAnalysisResult = JSON.parse(responseText);
     return analysisResult;
   }
 
   async analyzeTopVideoRequestsForVideo(video: Video): Promise<string[]> {
+    if (video.topVideoRequests) {
+      const existingAnalysis = JSON.parse(video.topVideoRequests)[
+        'suggestions'
+      ];
+      return existingAnalysis;
+    }
+
     const message =
       "You are a youtube video comments analyzer for a youtube video. Given the following comments from a YouTube video, identify and return a list of the top 3 most requested videos or topics that the audience wants from the content creator. Ensure these are requests directed towards the content creator for future content. If there is no direct request, analyse the comments and suggest based on the discussions, what they might want as next topic. Do mention it if its directly asked or you analysed based on discussions. Make sure each suggestion is atleast 200 words long. Elaborate it properly. Please format your response as a direct JSON array containing three strings, each representing a distinct video suggestion. For example, the response should look like this { 'suggestions': ['suggestion 1', 'suggestion 2'], ['suggestion 3'] }.";
 
     const responseText =
       (await this.askAboutVideo(video, message)) || '{ "suggestions": [] }';
+
+    video.topVideoRequests = responseText;
+    await video.save();
+
     return JSON.parse(responseText)['suggestions'] || [];
   }
 
   async faqInsideComments(video: Video): Promise<string[]> {
+    if (video.faqInsideComments) {
+      const existingAnalysis = JSON.parse(video.faqInsideComments)['faqs'];
+      return existingAnalysis;
+    }
+
     const message = `
       You are an analyzer specializing in deriving insights from YouTube video comments. Your task is to sift through comments on a specific video and compile a list of the top frequently asked questions (FAQs) by the audience. These questions should reflect recurring inquiries or concerns that viewers have expressed, indicating areas where they seek further clarification or additional information.
 
@@ -72,12 +96,21 @@ export default class OpenaiService {
 
     const responseText =
       (await this.askAboutVideo(video, message)) || '{ "faqs": [] }';
+
+    video.faqInsideComments = responseText;
+    await video.save();
+
     return JSON.parse(responseText)['faqs'] || [];
   }
 
   async analyzeEmotionalTone(
     video: Video,
   ): Promise<EmotionalToneAnalysisResult> {
+    if (video.emotionalTone) {
+      const existingAnalysis = JSON.parse(video.emotionalTone)['emotions'];
+      return existingAnalysis;
+    }
+
     const message = `
       You are an analyzer specializing in deriving emotions from YouTube video comments. Your task is to sift through comments on a specific video and compile a list of emotions exporessed (Happiness, Frustration, Curosity, Sadness, Excitement etc). Provide a count for each category.
 
@@ -96,6 +129,10 @@ export default class OpenaiService {
 
     const responseText =
       (await this.askAboutVideo(video, message)) || '{ "emotions": {} }';
+
+    video.emotionalTone = responseText;
+    await video.save();
+
     return JSON.parse(responseText)['emotions'] || {};
   }
 
