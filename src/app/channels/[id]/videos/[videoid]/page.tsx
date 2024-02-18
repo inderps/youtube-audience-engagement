@@ -69,10 +69,12 @@ export default async function Page({ params }: PageProps) {
               )}
             </div>
             <div className="bg-gray-700 p-4 rounded-lg shadow-lg w-full">
-              <h2 className="text-xl font-semibold mb-4">
-                Emotional Tone Analysis
-              </h2>
-              <EmotionalToneRadarChart data={emotionalToneChartData} />
+              <h2 className="text-xl font-semibold mb-4">FAQs</h2>
+              <ul className="list-disc pl-5">
+                {faqs.map((faq, index) => (
+                  <li key={index}>{faq}</li>
+                ))}
+              </ul>
             </div>
           </div>
           <div className="flex flex-col gap-4 w-1/2">
@@ -85,12 +87,10 @@ export default async function Page({ params }: PageProps) {
               </ul>
             </div>
             <div className="bg-gray-700 p-4 rounded-lg shadow-lg w-full">
-              <h2 className="text-xl font-semibold mb-4">FAQs</h2>
-              <ul className="list-disc pl-5">
-                {faqs.map((faq, index) => (
-                  <li key={index}>{faq}</li>
-                ))}
-              </ul>
+              <h2 className="text-xl font-semibold mb-4">
+                Emotional Tone Analysis
+              </h2>
+              <EmotionalToneRadarChart data={emotionalToneChartData} />
             </div>
           </div>
         </div>
