@@ -24,7 +24,7 @@ export default async function Page({ params }: PageProps) {
     ],
   });
 
-  const personna = await openaiService.prepareUseePersona(channel!);
+  const profile = await openaiService.prepareUseeProfile(channel!);
 
   // const result = await openaiService.analyzeOverallSentiments(
   //   parseInt(params.id),
@@ -51,8 +51,13 @@ export default async function Page({ params }: PageProps) {
         />
         <div className="flex gap-4 w-full md:w-3/4">
           <div className="bg-gray-700 p-4 rounded-lg shadow-lg w-1/2">
-            <h2 className="text-xl font-semibold mb-4">Audience Persona</h2>
-            <p className="text-gray-300">{personna}</p>
+            <h2 className="text-xl font-semibold mb-4">Audience Profile</h2>
+            <p className="text-gray-300">{profile}</p>
+          </div>
+          <div className="bg-gray-700 p-4 rounded-lg shadow-lg w-1/2">
+            <h2 className="text-xl font-semibold mb-4">
+              Audience Pulse: Capturing Broad Interests for Content Innovation
+            </h2>
           </div>
         </div>
       </div>

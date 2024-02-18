@@ -15,6 +15,10 @@ interface EmotionalToneAnalysisResult {
   [key: string]: number;
 }
 
+interface CategoryAnalysisResult {
+  [key: string]: number;
+}
+
 export default class OpenaiService {
   private sequelize: Sequelize;
   private openai: OpenAI;
@@ -26,26 +30,61 @@ export default class OpenaiService {
     });
   }
 
-  async prepareUseePersona(channel: Channel): Promise<string | undefined> {
-    const message = `
-      You are tasked with analyzing comments from several YouTube videos of a particular channel to construct a collective audience persona with no limit on text. Make it bigger. This persona should accurately reflect the audience's preferences, including their likes and dislikes, as directly expressed in their comments. Focus on compiling insights that paint a vivid picture of what the audience values in the content, what they do not favor, and any prevalent themes or sentiments that emerge from their feedback.
+  async generateCategoriesFromProfile(
+    profile: string,
+  ): Promise<CategoryAnalysisResult | undefined> {
+    const message =
+      "Given an audience profile summary that emphasizes their likes, dislikes, engagement patterns, and content preferences, identify broad categories or thematic areas the audience is likely to enjoy. Avoid specific keywords from past content. Instead, focus on generalized interests that can inspire future video topics. Provide each category with a relevance score indicating its potential interest level to the audience. The response should be formatted as a JSON object, with each category as a key and its relevance score as the value. For example: { 'category 1': 0.8, 'category 2': 0.6, 'category 3': 0.4 }. Here is the profile: " +
+      profile;
 
-      The ultimate goal of this analysis is to create a detailed persona that not only encapsulates the audience's current views and preferences but also serves as a foundation for predicting how they might react to future content topics. This predictive aspect of the persona will guide content creation strategies, aiming to align future videos more closely with viewer expectations and preferences, thereby enhancing engagement and satisfaction.
+    const completion = await this.openai.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: message,
+        },
+      ],
+      model: 'gpt-3.5-turbo',
+      response_format: { type: 'json_object' },
+    });
 
-      Remember, the persona should focus more on the information provided in the comments, you can make assumptions or extrapolations but don't over invent things too much.
-      The response must be in pure essay format as paragraph to persona key in JSON format. Eg: { "persona": "bla bla" }
-      `;
+    const responseText = completion.choices[0].message.content?.trim();
 
-    let persona = 'EMPTY';
-    for (const video of channel.videos) {
-      const promptMessage = `${message}. Here is the previous personna you created. ${persona}. Add new information by analysing following comments and give me back complete comprehensive text about the audience also keep the previous persona in response too. Club them together and create final essay in paragraph to persona key in JSON format. Keep it quite elaborate. Eg: { "persona": "bla bla" }.`;
-      const responseText = await this.askAboutVideo(video, promptMessage);
-      persona = JSON.parse(responseText!)['persona'] || '';
+    if (!responseText) {
+      return;
     }
 
-    console.log('responseText', persona); // eslint-disable-line no-console
+    const result: CategoryAnalysisResult = JSON.parse(responseText);
+    return result;
+  }
 
-    return persona;
+  async prepareUseeProfile(channel: Channel): Promise<string | undefined> {
+    if (channel.userProfile) {
+      return channel.userProfile;
+    }
+
+    const message = `
+      You are tasked with analyzing comments from several YouTube videos of a particular channel to construct a collective audience profile with no limit on text. Make it bigger. This profile should accurately reflect the audience's preferences, including their likes and dislikes, as directly expressed in their comments. Focus on compiling insights that paint a vivid picture of what the audience values in the content, what they do not favor, and any prevalent themes or sentiments that emerge from their feedback.
+
+      The ultimate goal of this analysis is to create a detailed profile that not only encapsulates the audience's current views and preferences but also serves as a foundation for predicting how they might react to future content topics. This predictive aspect of the profile will guide content creation strategies, aiming to align future videos more closely with viewer expectations and preferences, thereby enhancing engagement and satisfaction.
+
+      Remember, the profile should focus more on the information provided in the comments, you can make assumptions or extrapolations but don't over invent things too much.
+      The response must be in pure essay format as paragraph to profile key in JSON format. Eg: { "profile": "bla bla" }
+      `;
+
+    let profile = 'EMPTY';
+    for (const video of channel.videos) {
+      const promptMessage = `${message}. Here is the previous personna you created. ${profile}. Add new information by analysing following comments and give me back complete comprehensive text about the audience also keep the previous profile in response too. Club them together and create final essay in paragraph to profile key in JSON format. Keep it quite elaborate. Eg: { "profile": "bla bla" }.`;
+      const responseText = await this.askAboutVideo(video, promptMessage);
+      profile = JSON.parse(responseText!)['profile'] || '';
+    }
+
+    channel.userProfile = profile;
+    await channel.save();
+
+    console.log('responseText', profile); // eslint-disable-line no-console
+
+    return profile;
   }
 
   async analyzeSentimentsForVideo(

@@ -15,4 +15,10 @@ export default class Channel extends Model {
 
   @HasMany(() => Comment)
   comments!: Comment[];
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  userProfile!: string;
 }
