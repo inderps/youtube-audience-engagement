@@ -48,7 +48,15 @@ export default async function Page({ params }: PageProps) {
         <h1 className="text-2xl font-bold">{video!.name}</h1>
       </div>
       <div className="flex justify-between items-start gap-4">
-        <Sidebar channelId={channelId} videos={channel?.videos || []} />
+        <Sidebar
+          channelId={channelId}
+          videos={
+            channel?.videos.map((video) => ({
+              id: video.id,
+              name: video.name,
+            })) || []
+          }
+        />
         <div className="flex gap-4 w-full md:w-3/4">
           <div className="flex flex-col gap-4 w-1/2">
             <div className="bg-gray-700 p-4 rounded-lg shadow-lg w-full">

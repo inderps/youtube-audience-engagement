@@ -36,7 +36,15 @@ export default async function Page({ params }: PageProps) {
   return (
     <div className="dark:bg-gray-800 dark:text-gray-200 p-4">
       <div className="flex justify-between items-start gap-4">
-        <Sidebar channelId={channelId} videos={channel?.videos || []} />
+        <Sidebar
+          channelId={channelId}
+          videos={
+            channel?.videos.map((video) => ({
+              id: video.id,
+              name: video.name,
+            })) || []
+          }
+        />
         <div className="flex gap-4 w-full md:w-3/4">
           <div className="bg-gray-700 p-4 rounded-lg shadow-lg w-1/2">
             <h2 className="text-xl font-semibold mb-4">
