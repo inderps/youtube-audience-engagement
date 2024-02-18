@@ -60,7 +60,7 @@ export default async function Page({ params }: PageProps) {
         <div className="flex gap-4 w-full md:w-3/4">
           <div className="flex flex-col gap-4 w-1/2">
             <div className="bg-gray-700 p-4 rounded-lg shadow-lg w-full">
-              <h2 className="text-xl font-semibold mb-4">Sentiment Analysis</h2>
+              <h2 className="text-xl font-semibold mb-4">Content Value Feedback: Sentiment Analysis</h2>
               {result && (
                 <SentimentAnalysisPieChart sentimentAnalysis={result} />
               )}

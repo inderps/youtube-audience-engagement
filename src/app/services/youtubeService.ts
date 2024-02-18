@@ -63,7 +63,7 @@ export default class YouTubeService {
       const response = await this.youtube.commentThreads.list({
         part: ['snippet'],
         videoId: video.youtubeId,
-        maxResults: 30,
+        maxResults: 80,
       });
 
       const items = response.data.items;
