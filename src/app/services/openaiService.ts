@@ -11,6 +11,10 @@ interface SentimentAnalysisResult {
   content_quality: string;
 }
 
+interface EmotionalToneAnalysisResult {
+  [key: string]: number;
+}
+
 export default class OpenaiService {
   private sequelize: Sequelize;
   private openai: OpenAI;
@@ -45,6 +49,54 @@ export default class OpenaiService {
     const responseText =
       (await this.askAboutVideo(video, message)) || '{ "suggestions": [] }';
     return JSON.parse(responseText)['suggestions'] || [];
+  }
+
+  async faqInsideComments(video: Video): Promise<string[]> {
+    const message = `
+      You are an analyzer specializing in deriving insights from YouTube video comments. Your task is to sift through comments on a specific video and compile a list of the top frequently asked questions (FAQs) by the audience. These questions should reflect recurring inquiries or concerns that viewers have expressed, indicating areas where they seek further clarification or additional information.
+
+      Focus on identifying direct questions posed by viewers or implied questions based on the discussions in the comments. If direct questions are scarce, use your analysis to infer the most likely questions based on the topics discussed. Each identified FAQ should be derived from actual comments, highlighting the audience's desire for more information or clarification on those topics.
+
+      Please return your findings in a JSON array format, containing the top FAQs as strings. Each FAQ should be clearly stated as a question, and you should ensure that they are representative of the comments analyzed. The response should look like this:
+
+      {
+        "faqs": [
+          "What specific techniques were used in the video for ...?",
+          "Can you elaborate on the part where you discussed ...?",
+          "How does this process compare to ...?"
+        ]
+      }
+
+      Each FAQ should be concise yet informative, providing a clear question that captures the essence of what viewers are keen to understand further. Exclude any questions not related to the content's informational value or those that do not contribute to a deeper understanding of the video's topics.
+    `;
+
+    const responseText =
+      (await this.askAboutVideo(video, message)) || '{ "faqs": [] }';
+    return JSON.parse(responseText)['faqs'] || [];
+  }
+
+  async analyzeEmotionalTone(
+    video: Video,
+  ): Promise<EmotionalToneAnalysisResult> {
+    const message = `
+      You are an analyzer specializing in deriving emotions from YouTube video comments. Your task is to sift through comments on a specific video and compile a list of emotions exporessed (Happiness, Frustration, Curosity, Sadness, Excitement etc). Provide a count for each category.
+
+      Please return your findings in a JSON array format, containing the top FAQs as strings. Each FAQ should be clearly stated as a question, and you should ensure that they are representative of the comments analyzed. The response should look like this:
+
+      {
+        "emotions": {
+          "Happiness": 10,
+          "Frustration": 5,
+          "Curiosity": 3,
+          "Sadness": 2,
+          "Excitement": 7
+        }
+      }
+    `;
+
+    const responseText =
+      (await this.askAboutVideo(video, message)) || '{ "emotions": {} }';
+    return JSON.parse(responseText)['emotions'] || {};
   }
 
   async analyzeOverallSentiments(
