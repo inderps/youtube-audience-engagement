@@ -26,6 +26,28 @@ export default class OpenaiService {
     });
   }
 
+  async prepareUseePersona(channel: Channel): Promise<string | undefined> {
+    const message = `
+      You are tasked with analyzing comments from several YouTube videos of a particular channel to construct a collective audience persona with no limit on text. Make it bigger. This persona should accurately reflect the audience's preferences, including their likes and dislikes, as directly expressed in their comments. Focus on compiling insights that paint a vivid picture of what the audience values in the content, what they do not favor, and any prevalent themes or sentiments that emerge from their feedback.
+
+      The ultimate goal of this analysis is to create a detailed persona that not only encapsulates the audience's current views and preferences but also serves as a foundation for predicting how they might react to future content topics. This predictive aspect of the persona will guide content creation strategies, aiming to align future videos more closely with viewer expectations and preferences, thereby enhancing engagement and satisfaction.
+
+      Remember, the persona should focus more on the information provided in the comments, you can make assumptions or extrapolations but don't over invent things too much.
+      The response must be in pure essay format as paragraph to persona key in JSON format. Eg: { "persona": "bla bla" }
+      `;
+
+    let persona = 'EMPTY';
+    for (const video of channel.videos) {
+      const promptMessage = `${message}. Here is the previous personna you created. ${persona}. Add new information by analysing following comments and give me back complete comprehensive text about the audience also keep the previous persona in response too. Club them together and create final essay in paragraph to persona key in JSON format. Keep it quite elaborate. Eg: { "persona": "bla bla" }.`;
+      const responseText = await this.askAboutVideo(video, promptMessage);
+      persona = JSON.parse(responseText!)['persona'] || '';
+    }
+
+    console.log('responseText', persona); // eslint-disable-line no-console
+
+    return persona;
+  }
+
   async analyzeSentimentsForVideo(
     video: Video,
   ): Promise<SentimentAnalysisResult | undefined> {

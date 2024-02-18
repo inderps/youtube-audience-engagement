@@ -1,6 +1,6 @@
 import OpenaiService from '../../services/openaiService';
 import { sequelize } from '../../models/sequelize';
-import SentimentAnalysisPieChart from './SentimentAnalysisPieChart';
+// import SentimentAnalysisPieChart from './SentimentAnalysisPieChart';
 import Channel from '../../models/channel';
 import Video from '../../models/video';
 import Comment from '../../models/comment';
@@ -24,14 +24,18 @@ export default async function Page({ params }: PageProps) {
     ],
   });
 
-  const result = await openaiService.analyzeOverallSentiments(
-    parseInt(params.id),
-  );
+  const personna = await openaiService.prepareUseePersona(channel!);
 
-  // answers = "suggestion1, suggestion 2, suggestion 3"
-  const suggestions = await openaiService.analyzeTopVideoRequests(
-    parseInt(params.id),
-  );
+  // const result = await openaiService.analyzeOverallSentiments(
+  //   parseInt(params.id),
+  // );
+
+  // // answers = "suggestion1, suggestion 2, suggestion 3"
+  // const suggestions = await openaiService.analyzeTopVideoRequests(
+  //   parseInt(params.id),
+  // );
+
+  // console.log(suggestions, result); // eslint-disable-line no-console
 
   return (
     <div className="dark:bg-gray-800 dark:text-gray-200 p-4">
@@ -47,22 +51,8 @@ export default async function Page({ params }: PageProps) {
         />
         <div className="flex gap-4 w-full md:w-3/4">
           <div className="bg-gray-700 p-4 rounded-lg shadow-lg w-1/2">
-            <h2 className="text-xl font-semibold mb-4">
-              Sentiment Analysis for overall channel
-            </h2>
-            {result && <SentimentAnalysisPieChart sentimentAnalysis={result} />}
-            {result?.content_quality && (
-              <p className="mt-4">{result.content_quality}</p>
-            )}
-          </div>
-
-          <div className="bg-gray-700 p-4 rounded-lg shadow-lg w-1/2">
-            <h2 className="text-xl font-semibold mb-4">Top Video Requests</h2>
-            <ul className="list-disc pl-5">
-              {suggestions.map((suggestion, index) => (
-                <li key={index}>{suggestion}</li>
-              ))}
-            </ul>
+            <h2 className="text-xl font-semibold mb-4">Audience Persona</h2>
+            <p className="text-gray-300">{personna}</p>
           </div>
         </div>
       </div>
